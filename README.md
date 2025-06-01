@@ -31,9 +31,41 @@ This project implements a batch-processing job which evaluates links between tra
       pip install -r requirements.txt```
    
 3) Install Rust: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
-4) Compile `geoprop-py` using: ```cd geoprop-py && maturin build```
-5) Install the compiled binary using `pip install geoprop-py/target/wheels/geoprop-0.1.0-cp313-cp313-macosx_11_0_arm64.whl`. Replace the name of the `.whl` file with the one built automatically for your platform.
-6) Make the pipeline scripts executable: `chmod +x scripts/ *.sh`
-7) Copy the `.env.template` file to `.env`: `cp .env.template .env`, make any desired configuration changes.
-8) 
+4) Install GNU Parallel () using: `brew install parallel` or the equivalent for your operating system. 
+5) Compile `geoprop-py` using: ```cd geoprop-py && maturin build```
+6) Install the compiled binary using `pip install geoprop-py/target/wheels/geoprop-0.1.0-cp313-cp313-macosx_11_0_arm64.whl`. Replace the name of the `.whl` file with the one built automatically for your platform.
+7) Make the pipeline scripts executable: `chmod +x scripts/ *.sh`
+8) Copy the `.env.template` file to `.env`: `cp .env.template .env`, make any desired configuration changes.
+
+# Running
+
+The pipeline is run using `./run_pipeline.sh`. Batches of hotspot pubkeys are downloaded from the ArangoDB instance and stored in `hotspots.` Beaconer-witnesss pairs for hotspot pubkey are downloaded from ArangoDB and the reported average RSSI is compared to the expected loss based on the ITM model and asserted locations, antenna gains, and elevations. Hotspots which outperform the model by a significant margin (configurable by setting  `THRESHOLD_DB` in `.env`) are flagged and written to a csv of beaconer, witness pubkeys in `itm_classifier_output.csv`. 
+
+# Data Interpretation and Operating Principles
+
+Radio signals weaken as they propagate through space. This signal loss, also known as path loss, varies predictably based on the distance between transmitter and receiver and the terrain.
+
+One widely used model for predicting this signal loss is the Irregular Terrain Model (ITM) — [see ITM overview](https://its.ntia.gov/software/itm). ITM is a standard in the telecommunications industry for modeling radio propagation. Accurate predictions with ITM require a reliable digital elevation model (DEM). In this project, we use the NASA SRTM dataset ([SRTM on Earthdata](https://www.earthdata.nasa.gov/data/instruments/srtm)), which provides near-global terrain elevation data at a resolution of 90 meters per pixel.
+
+Our implementation uses the open-source library [geoprop-py](https://github.com/JayKickliter/geoprop-py), which itself is based on the original ITM reference implementation: [NTIA ITM GitHub](https://github.com/NTIA/itm).
+
+## How the Classifier Works
+
+This classifier compares:
+- The predicted signal loss (from ITM, based on terrain and distance), and
+- The reported RSSI (Received Signal Strength Indicator) from real-world transmissions.
+
+Because terrain and distance impose a hard lower bound on how much signal loss is physically possible, the comparison allows us to flag transmissions that appear too good to be true, by  significantly outperforming the ITM prediction. This is effective because obstacles not included in the DEM (such as windows, trees, or buildings) degrade the signal below the minimum set by the ITM model. The key assumption is that since packet-replay attackers (see: https://github.com/heliumiotgrants/helium-iot-grants/blob/main/milestones/docs/attacks.md) do not know the location of the transmitting hotspots, they must make a guess as to the signal strength to report. This guess cannot take into account the terrain, but must also be above the sensitivity threshold for the radio receivers.
+
+## Outputs
+
+Each flagged beaconer-witness pair is recorded in a csv file for inclusion in the community denylist run by Nova Labs. Additionally, a PDF "report card" is generated for the worst pair for each hotspot. The report cards show the terrain profile between the transmitter and receiver, as well as the model loss between them. The following example shows two hotspots with significant terrian obstructions:
+
+<img width="1398" alt="image" src="https://github.com/user-attachments/assets/b8249492-333e-4a53-8d86-ff9165bcbd87" />
+
+In this example, the reported RSSI (approximately -130 dBm) is well above both the value predicted by the model for this link (-230 dBm) as well as the best-case sensitivity limit for the radio receiver (approximately -140 dBm for LoRa concentrators). Based on the asserted locations, this link cannot physically occur. 
+
+
+
+
 
