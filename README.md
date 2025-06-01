@@ -65,7 +65,12 @@ Each flagged beaconer-witness pair is recorded in a csv file for inclusion in th
 
 In this example, the reported RSSI (approximately -130 dBm) is well above both the value predicted by the model for this link (-230 dBm) as well as the best-case sensitivity limit for the radio receiver (approximately -140 dBm for LoRa concentrators). Based on the asserted locations, this link cannot physically occur. 
 
+## Sample Data
 
+A complete run for the time period between April 21 and May 5th 2025 produced the following list of flagged beaconer->witness pairs and report cards:
 
+https://drive.google.com/file/d/1nzr3HBq5-cm2yZaNsFmlID3eeNqhmDgM/view?usp=sharing
+
+https://drive.google.com/file/d/1fUn3X8WbWuNowPatlAmT3x-y67cV4bqn/view?usp=sharing
 
 
