@@ -28,14 +28,14 @@ This project implements a batch-processing job which evaluates links between tra
 
    ```python -m venv .venv
       source .venv/bin/activate
-      pip install -r requirements.txt```
-   
+      pip install -r requirements.txt```   
 3) Install Rust: `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
-4) Install GNU Parallel () using: `brew install parallel` or the equivalent for your operating system. 
-5) Compile `geoprop-py` using: ```cd geoprop-py && maturin build```
-6) Install the compiled binary using `pip install geoprop-py/target/wheels/geoprop-0.1.0-cp313-cp313-macosx_11_0_arm64.whl`. Replace the name of the `.whl` file with the one built automatically for your platform.
-7) Make the pipeline scripts executable: `chmod +x scripts/ *.sh`
-8) Copy the `.env.template` file to `.env`: `cp .env.template .env`, make any desired configuration changes.
+4) Obtain the 3-arcsecond NASA SRTM terrain tiles following the instructions here: https://github.com/heliumiotgrants/helium-iot-grants/tree/main/milestones/docs
+5) Install GNU Parallel () using: `brew install parallel` or the equivalent for your operating system. 
+6) Compile `geoprop-py` using: ```cd geoprop-py && maturin build```
+7) Install the compiled binary using `pip install geoprop-py/target/wheels/geoprop-0.1.0-cp313-cp313-macosx_11_0_arm64.whl`. Replace the name of the `.whl` file with the one built automatically for your platform.
+8) Make the pipeline scripts executable: `chmod +x scripts/ *.sh`
+9) Copy the `.env.template` file to `.env`: `cp .env.template .env`, make any desired configuration changes.
 
 # Running
 
