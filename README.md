@@ -1,2 +1,3 @@
 # helium-itm-classifier
-classify connections on the Helium IOT network using the ITM model
+
+Detect spoofed connections on the Helium IOT network using the ITM model and https://github.com/JayKickliter/geoprop-py.
